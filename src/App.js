@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './App.css';
 
 // Helper function to convert audio buffer to WAV format
 const convertToWav = (buffer) => {
@@ -64,6 +65,16 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
 
+  const [messages, setMessages] = useState([
+    { sender: 'bot', text: 'How can I be of help today?' },
+    { sender: 'user', text: 'I want to cancel my order' },
+    { sender: 'bot', text: 'I will be glad to help you, what is the Order Number?' },
+    { sender: 'user', text: 'My order number is 1234' },
+  ]);
+
+  const [inputText, setInputText] = useState('');
+  const apiUrl = 'http://localhost:5000';
+
   useEffect(() => {
     if (recording) {
       startRecording();
@@ -95,7 +106,7 @@ function App() {
           formData.append('audio', new Blob([wavBuffer], { type: 'audio/wav' }), 'audio.wav');
           formData.append('language', language);
 
-          const response = await axios.post('http://localhost:5000/process', formData, {
+          const response = await axios.post(apiUrl + '/process', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -116,20 +127,88 @@ function App() {
     setRecording(!recording);
   };
 
+  const handleSendMessage = async () => {
+    if (inputText.trim() === '') return;
+
+    const newMessages = [...messages, { sender: 'user', text: inputText }];
+    setMessages(newMessages);
+    setInputText('');
+
+    const response = await axios.post(apiUrl +  '/chat', { message: inputText, language: language });
+    const botMessage = response.data.message;
+
+    setMessages([...newMessages, { sender: 'bot', text: botMessage }]);
+  };
+
+  const handleInputChange = (e) => {
+    setInputText(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
   return (
-    <div>
-      <h1>Customer Support Chatbot</h1>
-      <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-        <option value="en">English</option>
-        <option value="hi">Hindi</option>
-        <option value="ur">Urdu</option>
-        <option value="it">Italian</option>
-        <option value="es">Spanish</option>
-      </select>
-      <button onClick={toggleRecording}>
-        {recording ? 'Stop Recording' : 'Start Recording'}
-      </button>
-      {audioUrl && <audio controls src={audioUrl} autoPlay></audio>}
+    // <div>
+    //   <h1>Customer Support Chatbot</h1>
+    //   <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+    //     <option value="en">English</option>
+    //     <option value="hi">Hindi</option>
+    //     <option value="ur">Urdu</option>
+    //     <option value="it">Italian</option>
+    //     <option value="es">Spanish</option>
+    //   </select>
+    //   <button onClick={toggleRecording}>
+    //     {recording ? 'Stop Recording' : 'Start Recording'}
+    //   </button>
+    //   {audioUrl && <audio controls src={audioUrl} autoPlay></audio>}
+    // </div>
+
+    <div className="background">
+      <div className="chat-spacer"></div>
+      <div className="chat-container">
+        <div className="chat-header">
+          <h1>Multilingual Conversational Dialogue: Case
+            Study of Customer Support Bots</h1>
+          
+          <select className="language-select" value={language} onChange={(e) => setLanguage(e.target.value)}>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="ur">Urdu</option>
+            <option value="it">Italian</option>
+            <option value="es">Spanish</option>
+          </select>
+        </div>
+        <div className="chat-box">
+          {messages.map((msg, index) => (
+            <div key={index} className={`chat-message ${msg.sender}`}>
+              <p>
+                <b>{msg.sender}:</b>
+                <div>{msg.text}</div>
+              </p>
+            </div>
+          ))}
+        </div>
+        {audioUrl && <audio controls src={audioUrl} className='audio-player' autoPlay></audio>}
+        <div className="chat-controls">
+          <input
+            type="text"
+            className="message-input"
+            value={inputText}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Type a message..."
+          />
+          <button className="send-button" onClick={handleSendMessage}>
+            Send
+          </button>
+          <button className={recording ? 'stop-recording' : 'record-button'} onClick={toggleRecording}>
+            {recording ? 'Stop' : 'Speak'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
