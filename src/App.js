@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import BleuData from './bleudata';
 
 // Helper function to convert audio buffer to WAV format
 const convertToWav = (buffer) => {
@@ -73,6 +74,10 @@ function App() {
   ]);
 
   const [inputText, setInputText] = useState('');
+  const [sourceText, setSourceText] = useState('');
+  const [targetText, setTargetText] = useState('');
+  const [referenceText, setReferenceText] = useState('');
+  
   const apiUrl = 'http://localhost:5000';
 
   useEffect(() => {
@@ -138,10 +143,22 @@ function App() {
     const botMessage = response.data.message;
 
     setMessages([...newMessages, { sender: 'bot', text: botMessage }]);
+    setTargetText(botMessage);
   };
+
+  const handleBleu = async () => {
+    if (referenceText.trim() === '') return;
+
+    const response = await axios.post(apiUrl + '/evaluate_bleu', { source: sourceText, target: targetText, reference: referenceText, language: language });
+    
+    setReferenceText('');
+
+    return response;
+  }
 
   const handleInputChange = (e) => {
     setInputText(e.target.value);
+    setSourceText(e.target.value);
   };
 
   const handleKeyPress = (e) => {
@@ -151,27 +168,11 @@ function App() {
   };
 
   return (
-    // <div>
-    //   <h1>Customer Support Chatbot</h1>
-    //   <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-    //     <option value="en">English</option>
-    //     <option value="hi">Hindi</option>
-    //     <option value="ur">Urdu</option>
-    //     <option value="it">Italian</option>
-    //     <option value="es">Spanish</option>
-    //   </select>
-    //   <button onClick={toggleRecording}>
-    //     {recording ? 'Stop Recording' : 'Start Recording'}
-    //   </button>
-    //   {audioUrl && <audio controls src={audioUrl} autoPlay></audio>}
-    // </div>
-
     <div className="background">
       <div className="chat-spacer"></div>
       <div className="chat-container">
         <div className="chat-header">
-          <h1>Multilingual Conversational Dialogue: Case
-            Study of Customer Support Bots</h1>
+          <h1>Multilingual Conversational Dialogue: Case Study of Customer Support Bots <br /><small>Self-learning Conversation Tracking</small></h1>
           
           <select className="language-select" value={language} onChange={(e) => setLanguage(e.target.value)}>
             <option value="en">English</option>
@@ -209,6 +210,75 @@ function App() {
           </button>
         </div>
       </div>
+
+      <div className="chat-spacer"></div>
+      
+      {/* BLEU SCORE EVALUATION */}
+      <div className="bleu-container">
+        <div className="bleu-header">
+          <h1>BLEU (Bilingual Evaluation Understudy) Score Algorithm</h1>
+          Conversation Context Handling and Accuracy Evaluation
+        </div>
+        <div className="bleu-body">
+          <div>
+            Source Text:<br/>
+            <input
+              type="text"
+              className="input"
+              value={sourceText}
+              onChange={(e) => setSourceText(e.target.value)}
+              placeholder="Sources text..."
+            /> 
+          </div><br/>
+          <div>
+            Target/Machine-generated Text:<br />
+            <input
+              type="text"
+              className="input"
+              value={targetText}
+              onChange={(e) => setTargetText(e.target.value)} 
+              placeholder="Target/Machine-generated text..."
+            /> 
+          </div><br />
+          <div>
+            Expected/Reference Response Text:<br />
+            <input
+              type="text"
+              className="input"
+              value={referenceText}
+              onChange={(e) => setReferenceText(e.target.value)}
+              placeholder="Expected/Reference response text..."
+            /> 
+            <button className="send-button" onClick={handleBleu}>
+              Evaluate
+            </button>
+          </div>
+          <hr></hr>
+          <div className="table">
+            <BleuData />
+          </div>
+        </div>
+      </div>
+
+      <div className="chat-spacer"></div>
+      
+      {/* BIAS AND FAIRNESS EVALUATION */}
+      <div className="bias-container">
+        <div className="bias-header">
+          <h1>AI Fairness 360 (AIF360) Algorithm</h1>
+          Bias and Fairness Detection Evaluation
+        </div>
+        <div className="bias-body">
+
+          <hr></hr>
+          <div className="table">
+
+          </div>
+        </div>
+      </div>
+
+      <div className="chat-spacer"></div>
+      
     </div>
   );
 }

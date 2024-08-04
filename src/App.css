@@ -1,9 +1,7 @@
-.background {
+.App {
   width: 100%;
   height: 100vh;
-  background-image: url('../public/background.jpg');
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-color: #ececec;
 }
 
 .chat-spacer {
@@ -134,4 +132,58 @@
 .audio-player {
   width: 100%;
   display: none;
+}
+
+
+.bleu-container, .bias-container {
+  width: 75%;
+  margin: auto;
+  background-color: rgb(245, 245, 245, 0.9);
+  border: 1px solid #999;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.bleu-container h1, .bias-container h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.bleu-body, .bias-body {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+}
+.bleu-body hr, .bias-body hr {
+  border-color: #eee;
+}
+
+
+.input {
+  width: 650px;
+  padding: 8px;
+  margin-top: 5px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+table {
+  width: 100%;
+}
+table td {
+  font-size: 12px;
+  padding: 5px;
+  border: 1px solid #eee;
+  border-left: none;
+  border-right: none;
+}
+table tbody tr:nth-child(odd) {
+  background-color: #eee;
 }
