@@ -5,7 +5,7 @@ const BleuData = () => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:5000/load_bleu')
+        axios.get('http://localhost:5001/load_bleu')
             .then(response => {
                 setData(response.data);
             })
@@ -17,7 +17,7 @@ const BleuData = () => {
     return (
         <div>
             <br/>
-            <h1>BLEU Scores Evaluation</h1>
+            <h1>BLEU Scores Evaluation Data</h1>
             <br/>
             <table>
                 <thead>

@@ -31,6 +31,13 @@
   margin: 0;
 }
 
+.chat-intro {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
 .chat-box {
   height: 75%;
   overflow-y: auto;
@@ -47,11 +54,11 @@
   margin-bottom: 8px;
 }
 
-.chat-message.bot {
+.chat-message.Bot {
   justify-content: flex-start;
 }
 
-.chat-message.user {
+.chat-message.User {
   justify-content: flex-end;
 }
 
@@ -62,11 +69,11 @@
   background-color: #e1f5fe;
 }
 
-.chat-message.bot p {
+.chat-message.Bot p {
   background-color: #e1f5fe;
 }
 
-.chat-message.user p {
+.chat-message.User p {
   background-color: #c8e6c9;
 }
 
@@ -150,7 +157,7 @@
 }
 
 .bleu-body, .bias-body {
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -176,6 +183,7 @@
 
 table {
   width: 100%;
+  border: 1px solid #ccc;
 }
 table td {
   font-size: 12px;

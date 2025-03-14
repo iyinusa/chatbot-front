@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import BleuData from './bleudata';
+import PlotBleu from './plot_bleu';
 
 // Helper function to convert audio buffer to WAV format
 const convertToWav = (buffer) => {
@@ -66,19 +67,14 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
 
-  const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'How can I be of help today?' },
-    { sender: 'user', text: 'I want to cancel my order' },
-    { sender: 'bot', text: 'I will be glad to help you, what is the Order Number?' },
-    { sender: 'user', text: 'My order number is 1234' },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const [inputText, setInputText] = useState('');
   const [sourceText, setSourceText] = useState('');
   const [targetText, setTargetText] = useState('');
   const [referenceText, setReferenceText] = useState('');
   
-  const apiUrl = 'http://localhost:5000';
+  const apiUrl = 'http://localhost:5001';
 
   useEffect(() => {
     if (recording) {
@@ -117,6 +113,14 @@ function App() {
             },
           });
 
+          // return messages
+          const userMsg = response.data.userMsg;
+          const botMsg = response.data.botMsg;
+
+          const newMessages = [...messages, { sender: 'User', text: userMsg }];
+          setMessages(newMessages);
+          setMessages([...newMessages, { sender: 'Bot', text: botMsg }]);
+
           // Decode base64 audio content
           const audioContent = response.data.audio_content;
           const audioBlobs = new Blob([Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))], { type: 'audio/mp3' });
@@ -135,14 +139,14 @@ function App() {
   const handleSendMessage = async () => {
     if (inputText.trim() === '') return;
 
-    const newMessages = [...messages, { sender: 'user', text: inputText }];
+    const newMessages = [...messages, { sender: 'User', text: inputText }];
     setMessages(newMessages);
     setInputText('');
 
     const response = await axios.post(apiUrl +  '/chat', { message: inputText, language: language });
     const botMessage = response.data.message;
 
-    setMessages([...newMessages, { sender: 'bot', text: botMessage }]);
+    setMessages([...newMessages, { sender: 'Bot', text: botMessage }]);
     setTargetText(botMessage);
   };
 
@@ -181,6 +185,10 @@ function App() {
             <option value="it">Italian</option>
             <option value="es">Spanish</option>
           </select>
+        </div>
+        <div className="chat-intro">
+          <b><u>PLEASE NOTE:</u></b><br /><br />
+          This demo chatbot can only answer questions about Orders, as it is only for evaluation of a Multilingual Customer Support dialogue system. Your conversations will be used for training and evaluation purpose, so please DO NOT communicate personal or sensitive data.<br /><br />Thank you.
         </div>
         <div className="chat-box">
           {messages.map((msg, index) => (
@@ -254,25 +262,12 @@ function App() {
             </button>
           </div>
           <hr></hr>
-          <div className="table">
+          <div>
             <BleuData />
           </div>
-        </div>
-      </div>
 
-      <div className="chat-spacer"></div>
-      
-      {/* BIAS AND FAIRNESS EVALUATION */}
-      <div className="bias-container">
-        <div className="bias-header">
-          <h1>AI Fairness 360 (AIF360) Algorithm</h1>
-          Bias and Fairness Detection Evaluation
-        </div>
-        <div className="bias-body">
-
-          <hr></hr>
-          <div className="table">
-
+          <div>
+            <PlotBleu />
           </div>
         </div>
       </div>
